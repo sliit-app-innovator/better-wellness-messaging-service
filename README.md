@@ -1,1 +1,1 @@
-# better-wellness-messaging-service
+# better-wellness-service
