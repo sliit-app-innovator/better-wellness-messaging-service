@@ -2,6 +2,7 @@ package com.sliit.betterwellness.controller;
 
 import com.sliit.betterwellness.dto.ChatMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -16,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
@@ -28,6 +31,9 @@ public class ChatController {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final Map<String, List<ChatMessage>> chatHistory = new HashMap<>();
 	private final static Map<String, String> activeSessionTopic = new ConcurrentHashMap<>();
+
+	@Value("${chat.history.ttl}")
+	private int chatHistoryTTL;
 
 	public ChatController(SimpMessagingTemplate messagingTemplate, RedisTemplate<String, Object> redisTemplate) {
 		this.messagingTemplate = messagingTemplate;
@@ -53,14 +59,23 @@ public class ChatController {
 	@GetMapping("/history")
 	public List<ChatMessage> getChatHistory(@RequestParam int customerId, @RequestParam int counsellorId) {
 		String topic = String.format("/topic/chat/%d-%d", customerId, counsellorId);
-		return chatHistory.getOrDefault(topic, new ArrayList<>());
+		String redisKey = "chat:history:" + topic;
+
+		List<Object> rawMessages = redisTemplate.opsForList().range(redisKey, 0, -1);
+		if (rawMessages == null || rawMessages.isEmpty()) {
+			return  new ArrayList<>();
+		} else {
+			return rawMessages.stream()
+					.filter(obj -> obj instanceof ChatMessage)
+					.map(obj -> (ChatMessage) obj)
+					.toList();
+		}
 	}
 
 	private void addChatHostory(ChatMessage chatMessage, String topic) {
-		if (!this.chatHistory.containsKey(topic)) {
-			chatHistory.put(topic, new ArrayList<>());
-		}
-		chatHistory.get(topic).add(chatMessage);
+		String redisKey = "chat:history:" + topic;
+		redisTemplate.opsForList().rightPush(redisKey, chatMessage);
+		redisTemplate.expire(redisKey, chatHistoryTTL, TimeUnit.SECONDS);
 	}
 
 
