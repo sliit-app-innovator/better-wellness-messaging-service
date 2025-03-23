@@ -1,11 +1,15 @@
 package com.sliit.betterwellness.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatMessage {
 
 	private String sender;
 	private String message;
 	private int customerId;
 	private int counsellorId;
+	private long timestamp;
 
 	public String getSender() {
 		return sender;
@@ -37,6 +41,14 @@ public class ChatMessage {
 
 	public void setCounsellorId(int counsellorId) {
 		this.counsellorId = counsellorId;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 }
 
