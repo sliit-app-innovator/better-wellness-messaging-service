@@ -32,7 +32,6 @@ public class RedisMessageSubscriber implements MessageListener {
 			if (ChatController.getActiveSessionTopic().containsValue(topic)) {
 				System.out.println("Bradcasting message to topic "+ topic);
 				messagingTemplate.convertAndSend(topic, chatMessage);
-				messagingTemplate.convertAndSend(topic, chatMessage);
 			}
 
 		} catch (Exception e) {
