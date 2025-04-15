@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Controller
 @Slf4j
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/messaging-service")
 //@CrossOrigin(origins = "*")
 public class ChatController {
 
