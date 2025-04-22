@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     APP_VERSION: v2.0.0
-    REPOSITORY_URI: 061039760516.dkr.ecr.ap-south-1.amazonaws.com/better-wellness-repo
+    REPOSITORY_URI: 575453794606.dkr.ecr.ap-south-1.amazonaws.com/better-wellness-repo
     DOCKER_CONTAINER_NAME: better-wellness-repo
     CLUSTER_NAME: sliit-better-wellness-cluster
     REGION: ap-south-1
